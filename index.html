@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b16">
+  <title>Midnight Society — Community Feedback</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090914;
+      --panel: rgba(20, 21, 42, .92);
+      --panel-border: rgba(150, 128, 255, .22);
+      --text: #f4f2ff;
+      --muted: #aaa8c4;
+      --purple: #9b6cff;
+      --blue: #36b8ff;
+      --danger: #ff6b83;
+      --success: #55e6ad;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 36px 16px;
+      display: grid;
+      place-items: center;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 12% 8%, rgba(123, 75, 255, .20), transparent 36%),
+        radial-gradient(ellipse at 90% 85%, rgba(26, 157, 255, .15), transparent 34%),
+        var(--bg);
+    }
+    .shell { width: 100%; max-width: 690px; }
+    .brand { text-align: center; margin-bottom: 22px; }
+    .moon {
+      width: 58px; height: 58px; margin: 0 auto 13px;
+      display: grid; place-items: center; border-radius: 19px;
+      font-size: 30px; background: linear-gradient(145deg, rgba(155,108,255,.22), rgba(54,184,255,.16));
+      border: 1px solid var(--panel-border); box-shadow: 0 0 35px rgba(135,91,255,.18);
+    }
+    h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); letter-spacing: -.045em; }
+    .brand p { color: var(--muted); margin: 9px 0 0; line-height: 1.55; }
+    .card {
+      padding: clamp(21px, 5vw, 34px); border: 1px solid var(--panel-border);
+      border-radius: 24px; background: var(--panel); backdrop-filter: blur(16px);
+      box-shadow: 0 22px 80px rgba(0,0,0,.38);
+    }
+    .field { margin-bottom: 22px; }
+    label, legend { display: block; margin-bottom: 9px; font-size: .94rem; font-weight: 650; }
+    .optional { color: var(--muted); font-weight: 450; font-size: .83rem; }
+    input, select, textarea {
+      width: 100%; border: 1px solid rgba(171,161,220,.22); border-radius: 12px;
+      background: #101124; color: var(--text); padding: 13px 14px;
+      font: inherit; outline: none; transition: border-color .18s, box-shadow .18s;
+    }
+    input::placeholder, textarea::placeholder { color: #77758f; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(54,184,255,.13);
+    }
+    textarea { min-height: 175px; resize: vertical; line-height: 1.5; }
+    .rating-options { display: flex; gap: 10px; flex-wrap: wrap; }
+    .rating-options label {
+      margin: 0; width: 48px; height: 46px; display: grid; place-items: center;
+      border: 1px solid rgba(171,161,220,.25); border-radius: 12px;
+      background: #101124; cursor: pointer; color: #d9d4f5;
+    }
+    .rating-options input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .rating-options label:has(input:checked) {
+      color: white; border-color: var(--purple);
+      background: rgba(155,108,255,.22); box-shadow: 0 0 0 2px rgba(155,108,255,.12);
+    }
+    .rating-options label:focus-within { outline: 2px solid var(--blue); outline-offset: 3px; }
+    .hint { color: var(--muted); font-size: .8rem; margin-top: 7px; display: flex; justify-content: space-between; gap: 10px; }
+    button {
+      width: 100%; border: 0; border-radius: 13px; padding: 15px 18px;
+      color: white; font: inherit; font-weight: 750; font-size: 1rem; cursor: pointer;
+      background: linear-gradient(100deg, #8755f5, #347ff5 85%);
+      box-shadow: 0 9px 28px rgba(85,91,255,.25); transition: transform .15s, opacity .15s;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { cursor: wait; opacity: .65; transform: none; }
+    .status { display: none; margin-top: 17px; padding: 13px 15px; border-radius: 12px; line-height: 1.45; }
+    .status.success { display: block; color: var(--success); background: rgba(85,230,173,.09); border: 1px solid rgba(85,230,173,.25); }
+    .status.error { display: block; color: #ff9aaa; background: rgba(255,107,131,.09); border: 1px solid rgba(255,107,131,.25); }
+    .footer { text-align: center; color: #77758f; font-size: .78rem; margin: 18px 0 0; }
+    /* Honeypot: real people should never see or fill this field. */
+    .trap { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+    @media (max-width: 480px) {
+      body { padding: 25px 12px; }
+      .card { border-radius: 19px; }
+      .rating-options { justify-content: space-between; }
+      .rating-options label { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="brand">
+      <div class="moon" aria-hidden="true">🌙</div>
+      <h1>Midnight Society</h1>
+      <p>Your voice helps shape the community.<br>Share honest feedback about our meetings and ideas.</p>
+    </header>
+
+    <section class="card" aria-label="Community feedback form">
+      <form id="feedbackForm">
+        <!-- SETUP: Replace YOUR_FORM_ID in the script below with your Formspree form ID. -->
+        <input type="hidden" name="_subject" value="New Midnight Society feedback">
+        <div class="trap" aria-hidden="true">
+          <label>Leave this field empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <div class="field">
+          <label for="discordName">Discord name <span class="optional">(optional)</span></label>
+          <input id="discordName" name="discord_name" type="text" maxlength="80" placeholder="e.g. MidnightMember">
+        </div>
+
+        <div class="field">
+          <label for="topic">Topic</label>
+          <select id="topic" name="topic" required>
+            <option value="Last meeting">Last meeting</option>
+            <option value="Idea/suggestion">Idea/suggestion</option>
+            <option value="Problem/concern">Problem/concern</option>
+            <option value="Shout-out">Shout-out</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <fieldset class="field" style="border:0;padding:0;margin-left:0;margin-right:0">
+          <legend>Meeting rating</legend>
+          <div class="rating-options">
+            <label><input type="radio" name="meeting_rating" value="1" required><span>1</span></label>
+            <label><input type="radio" name="meeting_rating" value="2"><span>2</span></label>
+            <label><input type="radio" name="meeting_rating" value="3"><span>3</span></label>
+            <label><input type="radio" name="meeting_rating" value="4"><span>4</span></label>
+            <label><input type="radio" name="meeting_rating" value="5"><span>5</span></label>
+          </div>
+          <div class="hint"><span>1 = Needs work</span><span>5 = Excellent</span></div>
+        </fieldset>
+
+        <div class="field">
+          <label for="message">Feedback message <span style="color:var(--danger)">*</span></label>
+          <textarea id="message" name="message" maxlength="3000" required placeholder="Tell us what went well, what could improve, or what you'd like to see next time..."></textarea>
+          <div class="hint"><span>Please be respectful and constructive.</span><span id="counter">0 / 3000</span></div>
+        </div>
+
+        <button id="submitButton" type="submit">Send feedback <span aria-hidden="true">→</span></button>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+    <p class="footer">🌙 Midnight Society • Your feedback helps us grow together</p>
+  </main>
+
+  <script>
+    // Replace YOUR_FORM_ID with the ID from your Formspree form endpoint.
+    const FORMSPREE_ENDPOINT = "https://formspree.io/f/xjyyqkov";
+    const form = document.getElementById("feedbackForm");
+    const button = document.getElementById("submitButton");
+    const statusBox = document.getElementById("status");
+    const message = document.getElementById("message");
+    const counter = document.getElementById("counter");
+
+    message.addEventListener("input", () => {
+      counter.textContent = `${message.value.length} / 3000`;
+    });
+
+    function showStatus(kind, text) {
+      statusBox.className = `status ${kind}`;
+      statusBox.textContent = text;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      statusBox.className = "status";
+      statusBox.textContent = "";
+
+      if (FORMSPREE_ENDPOINT.includes("YOUR_FORM_ID")) {
+        showStatus("error", "The form is not connected yet. The site owner needs to finish the Formspree setup.");
+        return;
+      }
+
+      // Basic per-browser cooldown to discourage accidental rapid repeats.
+      const lastSent = Number(localStorage.getItem("midnightFeedbackLastSent") || 0);
+      if (Date.now() - lastSent < 30000) {
+        showStatus("error", "Please wait 30 seconds before sending another response.");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Sending…";
+
+      try {
+        const response = await fetch(FORMSPREE_ENDPOINT, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { "Accept": "application/json" }
+        });
+
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const detail = result.errors?.map(item => item.message).join(" ") || "Please try again in a moment.";
+          throw new Error(detail);
+        }
+
+        localStorage.setItem("midnightFeedbackLastSent", String(Date.now()));
+        form.reset();
+        counter.textContent = "0 / 3000";
+        showStatus("success", "Sent! Thanks for helping Midnight Society grow. Your feedback has been delivered.");
+      } catch (error) {
+        showStatus("error", `Couldn't send your feedback. ${error.message || "Check your connection and try again."}`);
+      } finally {
+        button.disabled = false;
+        button.innerHTML = 'Send feedback <span aria-hidden="true">→</span>';
+      }
+    });
+  </script>
+</body>
+</html>
